@@ -1,5 +1,6 @@
 import { api } from "../api/workbench.js";
 import { empty, pageHeading, section } from "../components/common/panel.js";
+import { progressMeter } from "../components/common/progress.js";
 import { status } from "../components/common/status.js";
 import { table } from "../components/common/table.js";
 import { Actions } from "../constants/states.js";
@@ -19,6 +20,7 @@ export async function overview(config) {
         cases.length ? table(["编号", "名称", "登记人"], cases.slice(0, 4).map(item => [item.code, item.title, item.created_by]), "近期资料") : empty("进入资料页登记第一条资料。")),
       section("最近执行", latest ?
         el("div", {class: "stack"}, status(latest.status), el("strong", {}, latest.case_title),
+          progressMeter(latest.progress, {label: "待验进度"}),
           el("a", {href: `#runs/${latest.id}`}, "查看执行进度")) :
         empty("选择演示资料并提交执行，此处会显示处理进度。"))),
     section("操作记录", audit.length ?

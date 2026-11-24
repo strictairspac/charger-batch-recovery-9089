@@ -2,6 +2,15 @@ from pydantic import BaseModel, Field
 from src.constants.job_state import JobState
 
 
+class Progress(BaseModel):
+    total: int
+    decided: int
+    passed: int
+    held: int
+    ports: int
+    pending: int
+
+
 class RunInput(BaseModel):
     parameter: int = Field(strict=True, ge=1)
 
@@ -18,3 +27,4 @@ class RunEntry(BaseModel):
     result: dict | None
     failure: str | None
     digest: str | None
+    progress: Progress

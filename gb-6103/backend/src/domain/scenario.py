@@ -1,5 +1,4 @@
 from .intake import validate
-from .transaction import receive
 
 CONFIG = {
     "title": "桐驿充电·换站批次验收",
@@ -46,14 +45,20 @@ FIXTURES = [
 ]
 
 
-def run(payload, parameter, db):
+def check(payload, parameter):
+    """Validate a batch before it is queued or resumed."""
     if type(parameter) is not int or not 1 <= parameter <= 100000:
         raise ValueError("验收下限须为 1–100000 kΩ 整数")
     validate(payload)
-    rows, accepted, ports = receive(db, payload["stations"], parameter)
-    held = len(rows) - accepted
+    return payload["stations"]
+
+
+def summarize(stations, evidence):
+    accepted = sum(1 for row in evidence if row["决定"] == "通过")
+    ports = sum(row["送检枪口"] for row in evidence if row["决定"] == "通过")
+    held = len(evidence) - accepted
     return {
-        "summary": f"{len(rows)} 次分站送检，{accepted} 站通过、{held} 次搁置，登记 {ports} 个枪口。",
+        "summary": f"{len(stations)} 次分站送检，{accepted} 站通过、{held} 次搁置，登记 {ports} 个枪口。",
         "metrics": {"通过站点": accepted, "搁置站点": held, "已登记枪口": ports},
-        "rows": rows,
+        "rows": evidence,
     }

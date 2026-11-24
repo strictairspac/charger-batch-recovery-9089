@@ -20,12 +20,10 @@ def list_entries(db):
 
 
 def create(db, data, actor):
-    validator = getattr(scenario, "validate", None)
-    if validator is not None:
-        try:
-            validator(data.payload)
-        except ValueError as exc:
-            raise HTTPException(422, str(exc)) from exc
+    try:
+        scenario.check(data.payload, scenario.CONFIG["default_parameter"])
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(422, str(exc)) from exc
     change = db.execute(insert(cases).values(**data.model_dump(), code=f"CASE-{uuid4().hex[:12].upper()}", created_by=actor))
     case_id = change.inserted_primary_key[0]
     record(db, "create_case", actor, "case", case_id)

@@ -43,6 +43,11 @@ def export(run_id: int):
         if run["status"] != JobState.DONE:
             raise HTTPException(409, "没有可导出的执行结果")
         run["review"] = reviews.get(db, run_id)
-    return Response(canonical_json(run), media_type="application/json", headers={
+    # Keep internal scheduling fields out of the evidence file.
+    evidence = {key: run[key] for key in (
+        "id", "case_id", "case_title", "status", "parameter", "actor",
+        "created_at", "finished_at", "result", "failure", "digest", "progress", "review",
+    )}
+    return Response(canonical_json(evidence), media_type="application/json", headers={
         "Content-Disposition": f"attachment; filename=evidence-{run_id}.json",
     })

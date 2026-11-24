@@ -86,6 +86,16 @@ nav a[aria-current=page], nav a:hover { background: var(--rail-highlight); borde
 .stack { display: grid; gap: .65rem; }
 .status { font-size: .86rem; font-weight: 700; width: fit-content; border-left: .2rem solid currentColor; background: var(--tint); padding: .24rem .56rem; }
 .state-done { color: var(--accent); }
+.state-running { color: var(--accent); }
+.state-failed { color: var(--signal); }
+.progress { display: grid; gap: .45rem; }
+.progress-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .4rem; }
+.progress-pending { color: var(--muted); font-size: .88rem; }
+.progress-track { height: .55rem; background: var(--tint); border-radius: var(--radius); overflow: hidden; }
+.progress-fill { display: block; height: 100%; background: var(--accent); transition: width .3s cubic-bezier(.17,.84,.44,1); }
+.progress-facts { display: flex; flex-wrap: wrap; gap: 1.1rem; margin: .1rem 0 0; }
+.progress-facts dt { font-size: .78rem; color: var(--muted); font-weight: 650; }
+.progress-facts dd { margin: .1rem 0 0; font-weight: 700; }
 .table-scroll { max-width: 100%; max-height: 27rem; overflow: auto; }
 table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .9rem; }
 th, td { padding: .6rem .7rem; vertical-align: top; text-align: left; border-bottom: 1px solid var(--rule); }

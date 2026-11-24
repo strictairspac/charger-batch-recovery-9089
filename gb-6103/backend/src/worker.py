@@ -27,8 +27,13 @@ def work():
                 if service_one():
                     continue
             except JobFailure as exc:
-                logger.exception("Execution %s failed", exc.run_id)
-                fail(exc)
+                outcome = fail(exc)
+                if outcome == "failed":
+                    logger.error("Execution %s failed permanently: %s", exc.run_id, exc.cause)
+                elif outcome == "retry":
+                    logger.warning("Execution %s interrupted; queued to resume: %s", exc.run_id, exc.cause)
+                    time.sleep(1)
+                # A stale attempt belongs to an older claim; drop it silently.
                 continue
             cache.blpop("workbench:wake", timeout=1)
         except (RedisError, SQLAlchemyError):

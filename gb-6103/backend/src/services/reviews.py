@@ -5,6 +5,7 @@ from sqlalchemy import insert, select
 from sqlalchemy.exc import IntegrityError
 
 from src.constants.job_state import JobState
+from src.domain.transaction import progress
 from src.models.reviews import reviews
 from . import audit, runs
 
@@ -16,8 +17,8 @@ def get(db, run_id):
 
 def sign(db, run_id, data, actor):
     run = runs.get(db, run_id)
-    if run["status"] != JobState.DONE:
-        raise HTTPException(409, "批次执行成功后才能签核")
+    if run["status"] != JobState.DONE or run["progress"]["pending"]:
+        raise HTTPException(409, "整批站点裁决完成后才能签核")
     try:
         db.execute(insert(reviews).values(run_id=run_id, note=data.note, actor=actor, created_at=int(time())))
     except IntegrityError as exc:
